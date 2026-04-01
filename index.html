@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Scout · Ofertas frescas para tu perfil</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #12121a;
+  --surface2: #1a1a26;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --accent: #7c6af7;
+  --accent2: #a594ff;
+  --green: #3ddba0;
+  --amber: #f0a040;
+  --red: #f06060;
+  --text: #e8e6f0;
+  --text2: #9893b0;
+  --text3: #5a5670;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+.app { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+
+.top-bar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 3rem; }
+.logo { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: -0.5px; }
+.logo span { color: var(--accent2); }
+.badge-days { font-size: 11px; font-weight: 500; padding: 4px 12px; border-radius: 20px; background: rgba(124,106,247,0.15); border: 1px solid rgba(124,106,247,0.3); color: var(--accent2); letter-spacing: 0.04em; }
+
+.upload-section { margin-bottom: 2rem; }
+.section-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text3); margin-bottom: 0.75rem; }
+
+.drop-zone { border: 1.5px dashed var(--border2); border-radius: 16px; padding: 2.5rem 2rem; text-align: center; cursor: pointer; transition: all 0.2s; background: rgba(124,106,247,0.03); position: relative; }
+.drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: rgba(124,106,247,0.08); }
+.drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+.drop-icon { width: 48px; height: 48px; margin: 0 auto 1rem; background: rgba(124,106,247,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+.drop-title { font-size: 15px; font-weight: 500; margin-bottom: 6px; }
+.drop-sub { font-size: 13px; color: var(--text2); }
+
+.file-selected { display: none; align-items: center; gap: 12px; padding: 1rem 1.25rem; background: rgba(61,219,160,0.08); border: 1px solid rgba(61,219,160,0.25); border-radius: 12px; margin-top: 1rem; }
+.file-selected.show { display: flex; }
+.file-name { font-size: 14px; font-weight: 500; color: var(--green); flex: 1; }
+.file-size { font-size: 12px; color: var(--text2); }
+.remove-file { background: none; border: none; cursor: pointer; color: var(--text2); font-size: 16px; padding: 2px 6px; border-radius: 4px; transition: color 0.15s; }
+.remove-file:hover { color: var(--red); }
+
+.or-divider { text-align: center; color: var(--text3); font-size: 12px; margin: 1rem 0; position: relative; }
+.or-divider::before, .or-divider::after { content: ''; position: absolute; top: 50%; width: 42%; height: 1px; background: var(--border); }
+.or-divider::before { left: 0; }
+.or-divider::after { right: 0; }
+
+textarea { width: 100%; min-height: 140px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; line-height: 1.6; resize: vertical; outline: none; transition: border-color 0.2s; }
+textarea:focus { border-color: var(--accent); }
+textarea::placeholder { color: var(--text3); }
+
+.filters-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.5rem; }
+.filter-group label { display: block; font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text3); margin-bottom: 6px; }
+select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 13px; outline: none; transition: border-color 0.2s; appearance: none; }
+select:focus { border-color: var(--accent); }
+option { background: #1a1a26; }
+
+.search-btn { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--accent), #a594ff); border: none; border-radius: 14px; color: #fff; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 0.04em; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 2rem; }
+.search-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 32px rgba(124,106,247,0.35); }
+.search-btn:active { transform: translateY(0); }
+.search-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.loading { display: none; text-align: center; padding: 3rem 0; }
+.loading.show { display: block; }
+.spinner { width: 40px; height: 40px; border: 2px solid var(--border2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1.5rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-steps { font-size: 13px; color: var(--text2); line-height: 2; }
+.loading-steps .step { opacity: 0.3; transition: opacity 0.4s; }
+.loading-steps .step.active { opacity: 1; color: var(--accent2); }
+.loading-steps .step.done { opacity: 0.6; }
+
+.results-header { display: none; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+.results-header.show { display: flex; }
+.results-title { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700; }
+.results-meta { font-size: 13px; color: var(--text2); margin-top: 3px; }
+.results-count { font-size: 11px; padding: 4px 12px; border-radius: 20px; background: rgba(61,219,160,0.12); color: var(--green); border: 1px solid rgba(61,219,160,0.2); font-weight: 600; }
+
+#results-container { display: none; }
+#results-container.show { display: block; }
+
+.tier-label { font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); padding: 1.5rem 0 0.6rem; display: flex; align-items: center; gap: 8px; }
+.tier-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.job-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.25rem; margin-bottom: 0.75rem; display: flex; gap: 14px; align-items: flex-start; transition: all 0.2s; animation: fadeUp 0.4s ease both; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.job-card:hover { border-color: var(--border2); background: var(--surface2); transform: translateX(2px); }
+
+.score-wrap { flex-shrink: 0; text-align: center; }
+.score-circle { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+.score-high { background: rgba(61,219,160,0.12); color: var(--green); border: 1.5px solid rgba(61,219,160,0.25); }
+.score-med { background: rgba(240,160,64,0.12); color: var(--amber); border: 1.5px solid rgba(240,160,64,0.25); }
+.score-low { background: rgba(124,106,247,0.12); color: var(--accent2); border: 1.5px solid rgba(124,106,247,0.25); }
+.score-label { font-size: 9px; color: var(--text3); letter-spacing: 0.05em; text-transform: uppercase; }
+
+.job-body { flex: 1; min-width: 0; }
+.job-title { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.job-company { font-size: 13px; color: var(--text2); margin-bottom: 8px; }
+.job-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; }
+.tag { font-size: 11px; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--border); color: var(--text2); }
+.tag-remote { border-color: rgba(124,106,247,0.35); color: var(--accent2); background: rgba(124,106,247,0.08); }
+.tag-hot { border-color: rgba(61,219,160,0.3); color: var(--green); background: rgba(61,219,160,0.08); }
+.tag-usd { border-color: rgba(240,160,64,0.3); color: var(--amber); background: rgba(240,160,64,0.08); }
+.job-match { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+.job-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; flex-shrink: 0; }
+.apply-btn { font-size: 12px; font-weight: 600; padding: 8px 16px; border-radius: 8px; background: rgba(124,106,247,0.15); border: 1px solid rgba(124,106,247,0.3); color: var(--accent2); cursor: pointer; text-decoration: none; white-space: nowrap; transition: all 0.2s; font-family: 'DM Sans', sans-serif; display: inline-block; }
+.apply-btn:hover { background: rgba(124,106,247,0.28); }
+.days-ago { font-size: 11px; color: var(--text3); }
+
+.error-box { display: none; background: rgba(240,96,96,0.1); border: 1px solid rgba(240,96,96,0.25); border-radius: 12px; padding: 1rem 1.25rem; font-size: 13px; color: #f09090; margin-bottom: 1.5rem; line-height: 1.6; }
+.error-box.show { display: block; }
+
+.empty-state { display: none; text-align: center; padding: 3rem 0; color: var(--text2); }
+.empty-state.show { display: block; }
+.empty-icon { font-size: 40px; margin-bottom: 1rem; }
+.empty-title { font-family: 'Syne', sans-serif; font-size: 16px; color: var(--text); margin-bottom: 6px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top-bar">
+    <div class="logo">Job<span>Scout</span></div>
+    <div class="badge-days">⚡ Últimos 5 días</div>
+  </div>
+
+  <div class="upload-section">
+    <div class="section-title">01 — Tu CV</div>
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="cvFile" accept=".pdf,.doc,.docx,.txt" />
+      <div class="drop-icon">📄</div>
+      <div class="drop-title">Arrastra tu CV aquí</div>
+      <div class="drop-sub">PDF, Word o TXT · máx 5MB</div>
+    </div>
+    <div class="file-selected" id="fileSelected">
+      <span style="font-size:20px">✅</span>
+      <span class="file-name" id="fileName">—</span>
+      <span class="file-size" id="fileSize"></span>
+      <button class="remove-file" onclick="removeFile()">✕</button>
+    </div>
+    <div class="or-divider">o pega el texto de tu CV</div>
+    <textarea id="cvText" placeholder="Pega aquí el contenido de tu CV: experiencia, habilidades, educación...&#10;Ejemplo: Ingeniero Industrial con 8 años en seguros, fintech e iGaming. SQL, Excel, Power BI, gestión de clientes VIP..."></textarea>
+  </div>
+
+  <div class="section-title">02 — Filtros</div>
+  <div class="filters-row">
+    <div class="filter-group">
+      <label>Modalidad</label>
+      <select id="filterMode">
+        <option value="remoto">100% Remoto</option>
+        <option value="hibrido">Remoto / Híbrido</option>
+        <option value="todos">Todos</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Sector</label>
+      <select id="filterSector">
+        <option value="todos">Todos los sectores</option>
+        <option value="igaming">iGaming / Betting</option>
+        <option value="fintech">Fintech / Seguros</option>
+        <option value="ops">Ops / Analytics</option>
+        <option value="csm">Customer Success</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Ubicación</label>
+      <select id="filterLocation">
+        <option value="latam">LATAM</option>
+        <option value="chile">Chile</option>
+        <option value="global">Global</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Idioma</label>
+      <select id="filterLang">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+        <option value="ambos">Ambos</option>
+      </select>
+    </div>
+  </div>
+
+  <button class="search-btn" id="searchBtn" onclick="searchJobs()">
+    <span>🔍</span> Buscar ofertas de los últimos 5 días
+  </button>
+
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div class="loading-steps">
+      <div class="step" id="step1">📄 Analizando tu CV...</div>
+      <div class="step" id="step2">🔍 Buscando ofertas en internet...</div>
+      <div class="step" id="step3">🧠 Evaluando match con tu perfil...</div>
+      <div class="step" id="step4">📊 Organizando por probabilidad...</div>
+    </div>
+  </div>
+
+  <div class="results-header" id="resultsHeader">
+    <div>
+      <div class="results-title">Ofertas encontradas</div>
+      <div class="results-meta" id="resultsMeta"></div>
+    </div>
+    <div class="results-count" id="resultsCount">0 roles</div>
+  </div>
+
+  <div id="results-container"></div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="empty-icon">🔎</div>
+    <div class="empty-title">No se encontraron ofertas</div>
+    <p style="font-size:13px">Intenta con diferentes filtros o amplía el sector de búsqueda.</p>
+  </div>
+</div>
+
+<script>
+let cvFileData = null;
+let cvFileName = '';
+
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('cvFile');
+
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+  if (file.size > 5 * 1024 * 1024) { showError('El archivo es demasiado grande. Máximo 5MB.'); return; }
+  cvFileName = file.name;
+  const reader = new FileReader();
+  reader.onload = e => {
+    cvFileData = e.target.result;
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = formatSize(file.size);
+    document.getElementById('fileSelected').classList.add('show');
+  };
+  reader.readAsText(file);
+}
+
+function formatSize(b) { return b < 1024 ? b + ' B' : b < 1048576 ? (b/1024).toFixed(1) + ' KB' : (b/1048576).toFixed(1) + ' MB'; }
+
+function removeFile() {
+  cvFileData = null; cvFileName = '';
+  fileInput.value = '';
+  document.getElementById('fileSelected').classList.remove('show');
+}
+
+function showError(msg) {
+  const el = document.getElementById('errorBox');
+  el.innerHTML = msg;
+  el.classList.add('show');
+}
+
+function setStep(n) {
+  for (let i = 1; i <= 4; i++) {
+    const el = document.getElementById('step' + i);
+    const orig = el.textContent.replace(/^✓ /, '');
+    if (i < n) { el.classList.remove('active'); el.classList.add('done'); el.textContent = '✓ ' + orig; }
+    else if (i === n) { el.classList.add('active'); el.classList.remove('done'); }
+    else { el.classList.remove('active', 'done'); }
+  }
+}
+
+async function searchJobs() {
+  const cvText = document.getElementById('cvText').value.trim();
+  const cvContent = cvFileData || cvText;
+  if (!cvContent) { showError('Por favor ingresa tu CV — sube un archivo o pega el texto.'); return; }
+
+  document.getElementById('searchBtn').disabled = true;
+  document.getElementById('loading').classList.add('show');
+  document.getElementById('results-container').classList.remove('show');
+  document.getElementById('resultsHeader').classList.remove('show');
+  document.getElementById('emptyState').classList.remove('show');
+  document.getElementById('errorBox').classList.remove('show');
+  document.getElementById('results-container').innerHTML = '';
+
+  [0,1800,4500,7500].forEach((d,i) => setTimeout(() => setStep(i+1), d));
+
+  const mode = document.getElementById('filterMode').value;
+  const sector = document.getElementById('filterSector').value;
+  const location = document.getElementById('filterLocation').value;
+  const lang = document.getElementById('filterLang').value;
+
+  const today = new Date().toLocaleDateString('es-CL', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const sectorMap = { todos:'todos los sectores relevantes', igaming:'iGaming, casinos online, sports betting', fintech:'fintech, insurtech, banca digital', ops:'operations analyst, business intelligence, data analytics', csm:'customer success, account management' };
+  const modeMap = { remoto:'100% remoto', hibrido:'remoto o híbrido', todos:'cualquier modalidad' };
+  const locMap = { latam:'LATAM / Latinoamérica', chile:'Chile', global:'global / worldwide' };
+  const langMap = { es:'español', en:'inglés', ambos:'español o inglés' };
+
+  const systemPrompt = `Eres un headhunter experto en empleo remoto para LATAM. Hoy es ${today}.
+Analiza el CV del usuario y busca en la web ofertas reales publicadas en los últimos 5 días.
+Filtros: modalidad=${modeMap[mode]}, sector=${sectorMap[sector]}, ubicación=${locMap[location]}, idioma=${langMap[lang]}.
+Busca en: LinkedIn, GetonBoard, Indeed, BettingJobs, Pentasia, RemoteRocketship, Wellfound, Glassdoor, Gamdom Careers, SmartRecruitment.
+Devuelve SOLO JSON válido sin texto adicional, sin markdown:
+{
+  "profile_summary": "resumen breve del perfil",
+  "jobs": [
+    {
+      "title": "...", "company": "...", "location": "...", "mode": "remoto|híbrido|presencial",
+      "sector": "igaming|fintech|ops|csm|otro", "score": 85, "tier": "high|med|stretch",
+      "days_ago": 2, "tags": ["tag1","tag2","tag3"], "is_usd": true, "is_hot": true,
+      "match_reason": "razón del match", "url": "URL directa a la oferta"
+    }
+  ]
+}
+Reglas: solo ofertas reales encontradas, mínimo 10, máximo 25, ordenadas por score desc. tier: high=75+, med=55-74, stretch<55.`;
+
+  try {
+    const resp = await fetch('/api/search', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `Mi CV:\n\n${cvContent}\n\nBusca ofertas de los últimos 5 días según los filtros.` }]
+      })
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({}));
+      throw new Error(err.error || `Error del servidor (${resp.status})`);
+    }
+
+    const data = await resp.json();
+    let fullText = '';
+    if (data.content) data.content.forEach(b => { if (b.type === 'text') fullText += b.text; });
+
+    let parsed;
+    try {
+      const clean = fullText.replace(/```json\n?/g,'').replace(/```\n?/g,'').trim();
+      const s = clean.indexOf('{'), e = clean.lastIndexOf('}');
+      parsed = JSON.parse(clean.slice(s, e+1));
+    } catch {
+      throw new Error('No se pudo procesar la respuesta. Intenta de nuevo.');
+    }
+
+    document.getElementById('loading').classList.remove('show');
+    renderResults(parsed);
+
+  } catch(err) {
+    document.getElementById('loading').classList.remove('show');
+    document.getElementById('searchBtn').disabled = false;
+    showError(`<strong>Error:</strong> ${err.message}<br><small>Verifica que el servidor esté activo y la API key configurada.</small>`);
+  }
+}
+
+function renderResults(data) {
+  document.getElementById('searchBtn').disabled = false;
+  const jobs = data.jobs || [];
+  if (!jobs.length) { document.getElementById('emptyState').classList.add('show'); return; }
+
+  document.getElementById('resultsHeader').classList.add('show');
+  document.getElementById('resultsMeta').textContent = data.profile_summary || '';
+  document.getElementById('resultsCount').textContent = jobs.length + ' roles';
+
+  const container = document.getElementById('results-container');
+  const tiers = { high:[], med:[], stretch:[] };
+  jobs.forEach(j => { const t = j.tier || (j.score>=75?'high':j.score>=55?'med':'stretch'); (tiers[t]||tiers.stretch).push(j); });
+
+  const labels = { high:'Alta probabilidad', med:'Probabilidad media', stretch:'Stretch roles' };
+  let delay = 0;
+
+  ['high','med','stretch'].forEach(tier => {
+    if (!tiers[tier].length) return;
+    const lbl = document.createElement('div');
+    lbl.className = 'tier-label';
+    lbl.textContent = `${labels[tier]} · ${tiers[tier].length}`;
+    container.appendChild(lbl);
+
+    tiers[tier].forEach(job => {
+      const sc = tier==='high'?'score-high':tier==='med'?'score-med':'score-low';
+      const card = document.createElement('div');
+      card.className = 'job-card';
+      card.style.animationDelay = delay + 'ms';
+      delay += 60;
+
+      const isRemote = (job.mode||'').toLowerCase().includes('remoto') || (job.mode||'').toLowerCase().includes('remote');
+      const daysTxt = !job.days_ago ? 'Hoy' : job.days_ago===1 ? 'Ayer' : `Hace ${job.days_ago} días`;
+
+      card.innerHTML = `
+        <div class="score-wrap">
+          <div class="score-circle ${sc}">${job.score}</div>
+          <div class="score-label">match</div>
+        </div>
+        <div class="job-body">
+          <div class="job-title">${job.title||'Sin título'}</div>
+          <div class="job-company">${job.company||''} · ${job.location||''}</div>
+          <div class="job-tags">
+            ${isRemote?'<span class="tag tag-remote">🌐 Remoto</span>':''}
+            ${job.is_hot?'<span class="tag tag-hot">🔥 Activo</span>':''}
+            ${job.is_usd?'<span class="tag tag-usd">💵 USD</span>':''}
+            ${(job.tags||[]).slice(0,3).map(t=>`<span class="tag">${t}</span>`).join('')}
+          </div>
+          <div class="job-match">${job.match_reason||''}</div>
+        </div>
+        <div class="job-actions">
+          <a class="apply-btn" href="${job.url||'#'}" target="_blank" rel="noopener">Postular ↗</a>
+          <div class="days-ago">${daysTxt}</div>
+        </div>`;
+      container.appendChild(card);
+    });
+  });
+
+  container.classList.add('show');
+  container.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+</script>
+</body>
+</html>
